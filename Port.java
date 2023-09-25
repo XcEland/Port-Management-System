@@ -1,4 +1,4 @@
-import java.util.*;
+import java.util.ArrayList;
 public class Port implements IPort {
     private  int ID;
     private double latitude;
@@ -29,13 +29,18 @@ public class Port implements IPort {
 
     public void incomingShip(Ship s){
         current.add(s);
-
     }
 
    public void outgoingShip(Ship s){
-         history.add(s);
-   }public  void getShips(Ship S){
+        history.add(s);
+   }
 
+   public  void getShips(Ship S){
+    
+   }
+
+    public void unloadContainer(Container container) {
+        containers.remove(container);
     }
 
 

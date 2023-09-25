@@ -1,14 +1,16 @@
-import java.util.*;
+
 abstract class Container {
     private int ID;
     private int weight;
+    private int portId;
 
 
-    public Container(int ID, int weight) {
+    public Container(int ID, int weight, int portId) {
         this.ID = ID;
         this.weight = weight;
+        this.portId = portId;
     }
-
+//+263784358898c
     abstract double consumption();
 
     boolean equals(Container other) {
@@ -31,6 +33,15 @@ abstract class Container {
     public void setWeight(int weight) {
         this.weight = weight;
     }
+
+    public void setPortID(int portId) {
+        this.portId = portId;
+    }
+
+    public int getPortID() {
+        return portId;
+    }
+
 }
 
 

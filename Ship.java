@@ -1,4 +1,4 @@
-import java.util.*;
+import java.util.ArrayList;
 public class Ship implements IShip {
     private int ID;
     private double fuel;
@@ -10,9 +10,13 @@ public class Ship implements IShip {
     private int maxNumberOfLiquidContainers;
     private double fuelConsumptionPerKM;
     private ArrayList<Container> containers;
+    int heavyContainerCount = 0;
+    int liquidContainerCount = 0;
+	int refrigeratedContainerCount = 0;
+    int basicContainerCount = 0;
 
     public Ship(int ID, Port p, int totalWeightCapacity, int maxNumberOfAllContainers, int maxNumberOfHeavyContainers,
-                int maxNumberOfRefrigeratedContainers, int maxNumberOfLiquidContainers, double fuelConsumptionPerKM) {
+                int maxNumberOfRefrigeratedContainers, int maxNumberOfLiquidContainers, double fuelConsumptionPerKM, double fuelTankCapacity) {
         this.ID = ID;
         this.currentPort = p;
         this.fuel = 0.0;
@@ -56,30 +60,82 @@ public class Ship implements IShip {
     @Override
     public boolean load(Container cont) {
         // Check if the ship has the capacity to load the container
-        if (containers.size() >= maxNumberOfAllContainers ||
-                (cont instanceof HeavyConytainer && containers.size() >= maxNumberOfHeavyContainer) ||
-                (cont instanceof RefrigratedContainer && containers.size() >= maxNumberOfRefrigeratedContainers) ||
-                (cont instanceof LiquidContainer && containers.size() >= maxNumberOfLiquidContainers) ||
-                getTotalWeight() + cont.getWeight() > totalWeightCapacity) {
+    
+        if (containers.size() >= maxNumberOfAllContainers) {
+            // Return false if the maximum number of all containers is reached
+            System.out.println("maximum number of all containers is reached");
             return false; // Loading not possible
         }
-
+    
+        if (cont instanceof HeavyContainer && countHeavyContainers() >= maxNumberOfHeavyContainer) {
+            // Return false if the maximum number of heavy containers is reached
+            System.out.println("maximum number of heavy containers is reached");
+            return false; // Loading not possible
+        }
+    
+        if (cont instanceof RefrigeratedContainer && countRefrigeratedContainers() >= maxNumberOfRefrigeratedContainers) {
+            // Return false if the maximum number of refrigerated containers is reached
+            System.out.println("maximum number of refrigerated containers is reached");
+            return false; // Loading not possible
+        }
+    
+        if (cont instanceof LiquidContainer && countLiquidContainers() >= maxNumberOfLiquidContainers) {
+            // Return false if the maximum number of liquid containers is reached
+            System.out.println("maximum number of liquid containers is reached");
+            return false; // Loading not possible
+        }
+    
+        if (getTotalWeight() + cont.getWeight() > totalWeightCapacity) {
+            // Return false if the total weight capacity is exceeded
+            System.out.println("total weight capacity is exceeded");
+            return false; // Loading not possible
+        }
+    
+        // If none of the conditions are met, loading is possible
         containers.add(cont);
+        incrementContainerCounters(cont);
         return true; // Container loaded successfully
     }
 
     @Override
     public boolean unLoad(Container cont) {
-        if (containers.contains(cont)) {
-            containers.remove(cont);
-            //   currentPort.addContainerToStorage(cont);
-            return true; // Container unloaded successfully
+        if (!containers.contains(cont)) {
+            // Container is not present in the ship
+            System.out.println("Container not found on the ship");
+            return false; // Unloading not possible
+        }
+    
+        // Remove the container from the ship
+        containers.remove(cont);
+        decrementContainerCounters(cont);
+        return true; // Container unloaded successfully
+    }
+
+    public void unloadAllContainers() {
+        for (Container container : containers) {
+            currentPort.unloadContainer(container);
+        }
+        containers.clear();
+    }
+
+    
+    private void decrementContainerCounters(Container cont) {
+        if (cont instanceof HeavyContainer) {
+            // Decrement the counter for heavy containers
+            heavyContainerCount--;
+        } else if (cont instanceof RefrigeratedContainer) {
+            // Decrement the counter for refrigerated containers
+            refrigeratedContainerCount--;
+        } else if (cont instanceof LiquidContainer) {
+            // Decrement the counter for liquid containers
+            liquidContainerCount--;
         } else {
-            return false; // Container not found on the ship
+            // Decrement the counter for basic containers
+            basicContainerCount--;
         }
     }
 
-    private int getTotalWeight() {
+    public int getTotalWeight() {
         int totalWeight = 0;
         for (Container cont : containers) {
             totalWeight += cont.getWeight();
@@ -176,24 +232,47 @@ public class Ship implements IShip {
         }
         return null;
     }
+
+    public int countHeavyContainers() {
+        for (Container container : containers) {
+            if (container instanceof HeavyContainer) {
+                heavyContainerCount++;
+            }
+        }
+        return heavyContainerCount;
+    }
+    
+    public int countRefrigeratedContainers() {
+        for (Container container : containers) {
+            if (container instanceof RefrigeratedContainer) {
+                refrigeratedContainerCount++;
+            }
+        }
+        return refrigeratedContainerCount;
+    }
+    
+    public int countLiquidContainers() {
+        for (Container container : containers) {
+            if (container instanceof LiquidContainer) {
+                liquidContainerCount++;
+            }
+        }
+        return liquidContainerCount;
+    }
+    
+    private void incrementContainerCounters(Container cont) {
+        if (cont instanceof HeavyContainer) {
+            // Increment the counter for heavy containers
+            heavyContainerCount++;
+        } else if (cont instanceof RefrigeratedContainer) {
+            // Increment the counter for refrigerated containers
+            refrigeratedContainerCount++;
+        } else if (cont instanceof LiquidContainer) {
+            // Increment the counter for liquid containers
+            liquidContainerCount++;
+        } else {
+            // Increment the counter for basic containers
+            basicContainerCount++;
+        }
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

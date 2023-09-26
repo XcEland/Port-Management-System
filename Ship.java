@@ -8,7 +8,9 @@ public class Ship implements IShip {
     private int maxNumberOfHeavyContainer;
     private int maxNumberOfRefrigeratedContainers;
     private int maxNumberOfLiquidContainers;
+    private int maxNumberOfBasicContainers;
     private double fuelConsumptionPerKM;
+    double fuelTankCapacity;
     private ArrayList<Container> containers;
     int heavyContainerCount = 0;
     int liquidContainerCount = 0;
@@ -21,6 +23,7 @@ public class Ship implements IShip {
         this.ID = ID;
         this.currentPort = p;
         this.fuel = 0.0;
+        this.fuelTankCapacity = fuelTankCapacity;
         this.totalWeightCapacity = totalWeightCapacity;
         this.maxNumberOfAllContainers = maxNumberOfAllContainers;
         this.maxNumberOfHeavyContainer = maxNumberOfHeavyContainers;
@@ -37,15 +40,24 @@ public class Ship implements IShip {
         return sortedContainers;
     }
 
+    public int maxNumberOfBasicContainers(){
+        return maxNumberOfAllContainers - (maxNumberOfHeavyContainer + maxNumberOfLiquidContainers + maxNumberOfRefrigeratedContainers);
+    }
+
     @Override
     public boolean sailTo(Port destinationPort) {
         double fuelConsumption = fuelRequired(destinationPort);
-
+    
         if (fuel >= fuelConsumption) {
             fuel -= fuelConsumption;
             currentPort.outgoingShip(this);
             currentPort = destinationPort;
             destinationPort.incomingShip(this);
+    
+            // Update the port for each container on the ship
+            for (Container container : containers) {
+                container.setPortID(destinationPort);
+            }
             return true;
         } else {
             return false;
@@ -73,12 +85,6 @@ public class Ship implements IShip {
             return false; // Loading not possible
         }
     
-        if (cont instanceof HeavyContainer && countHeavyContainers() >= maxNumberOfHeavyContainer) {
-            // Return false if the maximum number of heavy containers is reached
-            System.out.println("maximum number of heavy containers is reached");
-            return false; // Loading not possible
-        }
-    
         if (cont instanceof RefrigeratedContainer && countRefrigeratedContainers() >= maxNumberOfRefrigeratedContainers) {
             // Return false if the maximum number of refrigerated containers is reached
             System.out.println("maximum number of refrigerated containers is reached");
@@ -88,6 +94,18 @@ public class Ship implements IShip {
         if (cont instanceof LiquidContainer && countLiquidContainers() >= maxNumberOfLiquidContainers) {
             // Return false if the maximum number of liquid containers is reached
             System.out.println("maximum number of liquid containers is reached");
+            return false; // Loading not possible
+        }
+
+        if (cont instanceof BasicContainer && countBasicContainers() >= maxNumberOfBasicContainers()) {
+            // Return false if the maximum number of basic containers is reached
+            System.out.println("maximum number of liquid containers is reached");
+            return false; // Loading not possible
+        }
+
+        if (cont instanceof HeavyContainer && countHeavyContainers() >= maxNumberOfHeavyContainer) {
+            // Return false if the maximum number of heavy containers is reached
+            System.out.println("maximum number of heavy containers is reached");
             return false; // Loading not possible
         }
     
@@ -101,6 +119,46 @@ public class Ship implements IShip {
         containers.add(cont);
         incrementContainerCounters(cont);
         return true; // Container loaded successfully
+    }
+
+    public int countHeavyContainers() {
+        for (Container container : containers) {
+            if (container instanceof HeavyContainer && (!(container instanceof RefrigeratedContainer)) && (!(container instanceof LiquidContainer)) ){
+                heavyContainerCount++;
+                totalContainersCount ++;
+            }
+        }
+        return heavyContainerCount;
+    }
+    
+    public int countRefrigeratedContainers() {
+        for (Container container : containers) {
+            if (container instanceof RefrigeratedContainer) {
+                refrigeratedContainerCount++;
+                totalContainersCount ++;
+            }
+        }
+        return refrigeratedContainerCount;
+    }
+    
+    public int countLiquidContainers() {
+        for (Container container : containers) {
+            if (container instanceof LiquidContainer) {
+                liquidContainerCount++;
+                totalContainersCount ++;
+            }
+        }
+        return liquidContainerCount;
+    }
+
+    public int countBasicContainers() {
+        for (Container container : containers) {
+            if (container instanceof BasicContainer) {
+                basicContainerCount++;
+                totalContainersCount ++;
+            }
+        }
+        return basicContainerCount;
     }
 
     @Override
@@ -132,9 +190,9 @@ public class Ship implements IShip {
 
     
     private void decrementContainerCounters(Container cont) {
-        if (cont instanceof HeavyContainer) {
-            // Decrement the counter for heavy containers
-            heavyContainerCount--;
+        if (cont instanceof BasicContainer ) {
+            // Decrement the counter for basic containers
+            basicContainerCount--;
         } else if (cont instanceof RefrigeratedContainer) {
             // Decrement the counter for refrigerated containers
             refrigeratedContainerCount--;
@@ -142,8 +200,8 @@ public class Ship implements IShip {
             // Decrement the counter for liquid containers
             liquidContainerCount--;
         } else {
-            // Decrement the counter for basic containers
-            basicContainerCount--;
+            // Decrement the counter for heavy containers
+            heavyContainerCount--;
         }
         totalContainersCount--;
     }
@@ -221,12 +279,28 @@ public class Ship implements IShip {
         this.maxNumberOfLiquidContainers = maxNumberOfLiquidContainers;
     }
 
+    public int getMaxNumberOfBasicContainers() {
+        return maxNumberOfBasicContainers;
+    }
+
+    public void setMaxNumberOfBasicContainers(int maxNumberOfBasicContainers) {
+        this.maxNumberOfBasicContainers = maxNumberOfBasicContainers;
+    }
+
     public double getFuelConsumptionPerKM() {
         return fuelConsumptionPerKM;
     }
 
     public void setFuelConsumptionPerKM(double fuelConsumptionPerKM) {
         this.fuelConsumptionPerKM = fuelConsumptionPerKM;
+    }
+
+    public double getfuelTankCapacity() {
+        return fuelTankCapacity;
+    }
+
+    public void setfuelTankCapacity(double fuelTankCapacity) {
+        this.fuelTankCapacity = fuelTankCapacity;
     }
 
     public ArrayList<Container> getContainers() {
@@ -245,41 +319,11 @@ public class Ship implements IShip {
         }
         return null;
     }
-
-    public int countHeavyContainers() {
-        for (Container container : containers) {
-            if (container instanceof HeavyContainer) {
-                heavyContainerCount++;
-                totalContainersCount ++;
-            }
-        }
-        return heavyContainerCount;
-    }
-    
-    public int countRefrigeratedContainers() {
-        for (Container container : containers) {
-            if (container instanceof RefrigeratedContainer) {
-                refrigeratedContainerCount++;
-                totalContainersCount ++;
-            }
-        }
-        return refrigeratedContainerCount;
-    }
-    
-    public int countLiquidContainers() {
-        for (Container container : containers) {
-            if (container instanceof LiquidContainer) {
-                liquidContainerCount++;
-                totalContainersCount ++;
-            }
-        }
-        return liquidContainerCount;
-    }
     
     private void incrementContainerCounters(Container cont) {
-        if (cont instanceof HeavyContainer) {
-            // Increment the counter for heavy containers
-            heavyContainerCount++;
+        if (cont instanceof BasicContainer) {
+            // Increment the counter for basic containers
+            basicContainerCount++;
         } else if (cont instanceof RefrigeratedContainer) {
             // Increment the counter for refrigerated containers
             refrigeratedContainerCount++;
@@ -287,8 +331,8 @@ public class Ship implements IShip {
             // Increment the counter for liquid containers
             liquidContainerCount++;
         } else {
-            // Increment the counter for basic containers
-            basicContainerCount++;
+            // Increment the counter for heavy containers
+            heavyContainerCount++;
         }
         totalContainersCount ++;
     }

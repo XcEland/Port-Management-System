@@ -112,27 +112,39 @@ public class Main {
         int weight = scanner.nextInt();
         scanner.nextLine(); // Consume the newline character
 
+        
         String type = "";
-        if (weight >= 5000) {
-            System.out.print("Is the container refrigerated or liquid? (R/L): ");
-            type = scanner.nextLine();
-        }
 
-        Container container = new BasicContainer(id, weight, portId);
+        Container container;
+        System.out.print("Is the container refrigerated or liquid or None? (R/L/N): ");
+        type = scanner.nextLine();
+
         if (type.equals("R")) {
             container = new RefrigeratedContainer(id, weight, portId);
+            containers.add(container);
+            System.out.println("Refrigerated container created successfully");
+            
         } else if (type.equals("L")) {
             container = new LiquidContainer(id, weight, portId);
+            containers.add(container);
+            System.out.println("Liquid container created successfully");
         }
 
-        containers.add(container);
+        if (weight >= 5000 && type.equals("N")){
+            container = new HeavyContainer(id, weight, portId);
+            containers.add(container);
+            System.out.println("Heavy container created successfully");
+        }else if(weight < 5000 && type.equals("N")){
+            container = new BasicContainer(id, weight, portId);
+            containers.add(container);
+            System.out.println("Basic container created successfully");
+        }
 
-        System.out.println("Container created successfully.");
+        //containers.add(container);
 
     }
 
     private static void createShip() {
-
             Scanner scanner = new Scanner(System.in);
             System.out.print("Enter the ship ID:");
             int id = scanner.nextInt();
@@ -222,8 +234,8 @@ public class Main {
             System.out.println("Container not found.");
             return;
         }
-
-        if(shipId != containerId){
+        
+        if(ship.getCurrentPort().equals(container.getPoRtID())){
             System.out.println("Container is not on same port with Ship. Try another container.");
             return;
         }
@@ -305,33 +317,32 @@ public class Main {
 
             containersOnBoard(ship);
 
-        boolean sailed = ship.sailTo(destinationPort);
-        if (sailed) {
-            System.out.println("Ship sailed to the destination port successfully.");
-            System.out.println("--------------------------------");
-            System.out.println("Ship Details on Destination Port");
-            System.out.println("--------------------------------");
+            boolean sailed = ship.sailTo(destinationPort);
+            if (sailed) {
+                System.out.println("Ship sailed to the destination port successfully.");
+                System.out.println("--------------------------------");
+                System.out.println("Ship Details on Destination Port");
+                System.out.println("--------------------------------");
 
-            // Display ship summary
-            System.out.println("Ship ID: " + ship.getID());
-            System.out.println("Remaining Fuel: " + ship.getFuel());
-            System.out.println("Fuel consumed: " + fuelConsumed);
+                // Display ship summary
+                System.out.println("Ship ID: " + ship.getID());
+                System.out.println("Remaining Fuel: " + ship.getFuel());
+                System.out.println("Fuel consumed: " + fuelConsumed);
 
-            System.out.println("----Containers on board----");
-            for (Container container : ship.getCurrentContainers()) {
-                System.out.println("Container ID: " + container.getID() + ". Container Weight: " + container.getWeight());
+                System.out.println("----Containers on board----");
+                for (Container container : ship.getCurrentContainers()) {
+                    System.out.println("Container ID: " + container.getID() + ". Container Weight: " + container.getWeight());
                 
-            }
+                }
 
-            ship.unloadAllContainers();
-        }
-        }else {
+                ship.unloadAllContainers();
+            } else if(!sailed) {
             System.out.println("Already at " + destinationPortId + ". No need to sail.");
+            }
+            
+            System.out.println("Failed to sail to the destination port.");
+            return;
         }
-        
-        System.out.println("Failed to sail to the destination port.");
-        return;
-        
     }
 
     private static void reFuelShip() {
@@ -339,20 +350,24 @@ public class Main {
             System.out.print("Enter ship ID:");
             int shipId = scanner.nextInt();
 
-            System.out.print("Enter amount of fuel to refuel:");
-            double amountOfFuel = scanner.nextDouble();
-
-
             Ship ship = findShipById(ships, shipId);
             if (ship == null) {
                 System.out.println("Ship not found.");
                 return;
             }
+            
+            System.out.println("------------------------");
+            System.out.println("Ship Fuel Details");
+            System.out.println("------------------------");
+
+            System.out.println("Tank Capacity: " + ship.fuelTankCapacity + ". Fuel Level: " + ship.getFuel());
+
+            System.out.print("Enter amount of fuel to refuel:");
+            double amountOfFuel = scanner.nextDouble();
 
             ship.reFuel(amountOfFuel);
 
-
-        System.out.println("Ship refueled successfully.");
+            System.out.println("Ship refueled successfully. Current fuel level: "+ ship.getFuel());
     }
 
 
@@ -399,7 +414,7 @@ public class Main {
         System.out.println("Loading Status: H:" + ship.heavyContainerCount + "/" + ship.getMaxNumberOfHeavyContainer() +
             ", R:" + ship.refrigeratedContainerCount+"/" + ship.getMaxNumberOfRefrigeratedContainers() +
             ", L:" + ship.liquidContainerCount+ "/" +ship.getMaxNumberOfLiquidContainers() +
-            ", B:" + ship.basicContainerCount);
+            ", B:" + ship.basicContainerCount+ "/" +ship.getMaxNumberOfBasicContainers());
     }
 
     private static double calculateFuelConsumption(Ship ship){

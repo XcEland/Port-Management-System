@@ -3,6 +3,7 @@ abstract class Container {
     private int ID;
     private int weight;
     private int portId;
+    private Port portID;
 
 
     public Container(int ID, int weight, int portId) {
@@ -40,6 +41,14 @@ abstract class Container {
 
     public int getPortID() {
         return portId;
+    }
+
+    public void setPortID(Port portId) {
+        this.portID = portId;
+    }
+
+    public Port getPoRtID() {
+        return portID;
     }
 
 }

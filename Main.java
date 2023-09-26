@@ -21,9 +21,9 @@ public class Main {
             System.out.println("--------------------------------");
             System.out.println("Menu");
             System.out.println("--------------------------------");
-            System.out.println("1. Create a container");
-            System.out.println("2. Create a ship");
-            System.out.println("3. Create a port");
+            System.out.println("1. Create a port");
+            System.out.println("2. Create a container");
+            System.out.println("3. Create a ship");
             System.out.println("4. Load a container to a ship");
             System.out.println("5. Unload a container from a ship");
             System.out.println("6. Sail ship to another port");
@@ -35,13 +35,14 @@ public class Main {
 
             switch (choice) {
                 case 1:
-                    createContainer();
+                    createPort();
+                    
                     break;
                 case 2:
-                    createShip();
+                    createContainer();
                     break;
                 case 3:
-                    createPort();
+                    createShip();
                     break;
                 case 4:
                     loadContainer();
@@ -66,6 +67,24 @@ public class Main {
         } while (choice != 8);
     }
 
+    private static void createPort() {
+        System.out.print("Enter the x coordinate of the port: ");
+        double xCoordinate = scanner.nextDouble();
+
+        System.out.print("Enter the y coordinate of the port: ");
+        double yCoordinate = scanner.nextDouble();
+
+        System.out.print("Enter port number: ");
+        int portID = scanner.nextInt();
+        Port port = new Port(portID, xCoordinate, yCoordinate);
+
+        ports.add(port);
+        portIDCount++;
+
+        System.out.println("Port created successfully.");
+
+    }
+
     private static void createContainer() {
         Scanner scanner = new Scanner(System.in);
 
@@ -78,7 +97,7 @@ public class Main {
             return;
         }
 
-        System.out.println("Enter the container ID:");
+        System.out.print("Enter the container ID:");
         int id = scanner.nextInt();
 
         boolean isDuplicatedId =containers.stream()
@@ -95,7 +114,7 @@ public class Main {
 
         String type = "";
         if (weight >= 5000) {
-            System.out.print("Is the container refrigerated or liquid? (R/L)");
+            System.out.print("Is the container refrigerated or liquid? (R/L): ");
             type = scanner.nextLine();
         }
 
@@ -111,6 +130,7 @@ public class Main {
         System.out.println("Container created successfully.");
 
     }
+
     private static void createShip() {
 
             Scanner scanner = new Scanner(System.in);
@@ -208,7 +228,9 @@ public class Main {
             return;
         }
 
+
         System.out.println("Container loaded successfully.");
+        loadingStatus(ship);
     }
 
     private static void unloadContainer() {
@@ -222,6 +244,7 @@ public class Main {
                 return;
             }
 
+            //display all containers
             containersOnBoard(ship);
 
             System.out.print("Enter the container ID:");
@@ -254,7 +277,7 @@ public class Main {
             return;
         }
 
-        double fuelCondumed = calculateFuelConsumption(ship);
+        double fuelConsumed = calculateFuelConsumption(ship);
 
         System.out.println("--------------------------------");
         System.out.println("Ship Details on Current Port");
@@ -288,29 +311,19 @@ public class Main {
             // Display ship summary
             System.out.println("Ship ID: " + ship.getID());
             System.out.println("Remaining Fuel: " + ship.getFuel());
-            System.out.println("Fuel consumed: " + fuelCondumed);
+            System.out.println("Fuel consumed: " + fuelConsumed);
 
             System.out.println("----Containers on board----");
             for (Container container : ship.getCurrentContainers()) {
-                System.out.println("Container ID: " + container.getID());
-                System.out.println("Container Weight: " + container.getWeight());
+                System.out.println("Container ID: " + container.getID() + ". Container Weight: " + container.getWeight());
+                
             }
 
-            //System.out.print("Press 'L' to Unload Ship: ");
-
+            ship.unloadAllContainers();
         }else{
             System.out.println("Failed to sail to the destination port.");
+            return;
         }
-    }
-
-    private static double calculateFuelConsumption(Ship ship){
-        double fuelConsumed = 0.0;
-
-        for (Container container : ship.getCurrentContainers()) {
-            fuelConsumed += container.consumption();
-        }
-    
-        return fuelConsumed;
     }
 
     private static void reFuelShip() {
@@ -365,24 +378,6 @@ public class Main {
         return null;
     }
 
-    private static void createPort() {
-        System.out.print("Enter the x coordinate of the port: ");
-        double xCoordinate = scanner.nextDouble();
-
-        System.out.print("Enter the y coordinate of the port: ");
-        double yCoordinate = scanner.nextDouble();
-
-        System.out.print("Enter port number ");
-        int portID = scanner.nextInt();
-        Port port = new Port(portID, xCoordinate, yCoordinate);
-
-        ports.add(port);
-        portIDCount++;
-
-        System.out.println("Port created successfully.");
-
-    }
-
     public static void containersOnBoard(Ship ship){
         System.out.println("------------------------");
         System.out.println("Containers on Board");
@@ -392,5 +387,20 @@ public class Main {
         }
     }
 
+    public static void loadingStatus(Ship ship){
+        System.out.println("Loading Status: H:" + ship.heavyContainerCount + "/" + ship.getMaxNumberOfHeavyContainer() +
+            ", R:" + ship.refrigeratedContainerCount+"/" + ship.getMaxNumberOfRefrigeratedContainers() +
+            ", L:" + ship.liquidContainerCount+ "/" +ship.getMaxNumberOfLiquidContainers() +
+            ", B:" + ship.basicContainerCount);
+    }
 
+    private static double calculateFuelConsumption(Ship ship){
+        double fuelConsumed = 0.0;
+
+        for (Container container : ship.getCurrentContainers()) {
+            fuelConsumed += container.consumption();
+        }
+    
+        return fuelConsumed;
+    }
 }

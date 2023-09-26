@@ -116,6 +116,11 @@ public class Ship implements IShip {
             currentPort.unloadContainer(container);
         }
         containers.clear();
+        heavyContainerCount = 0;
+        liquidContainerCount = 0;
+	    refrigeratedContainerCount = 0;
+        basicContainerCount = 0;
+        System.out.println("All containers successfully unloaded.");
     }
 
     

@@ -14,6 +14,7 @@ public class Ship implements IShip {
     int liquidContainerCount = 0;
 	int refrigeratedContainerCount = 0;
     int basicContainerCount = 0;
+    int totalContainersCount = 0;
 
     public Ship(int ID, Port p, int totalWeightCapacity, int maxNumberOfAllContainers, int maxNumberOfHeavyContainers,
                 int maxNumberOfRefrigeratedContainers, int maxNumberOfLiquidContainers, double fuelConsumptionPerKM, double fuelTankCapacity) {
@@ -38,8 +39,7 @@ public class Ship implements IShip {
 
     @Override
     public boolean sailTo(Port destinationPort) {
-        double distance = currentPort.getDistance(destinationPort);
-        double fuelConsumption = fuelConsumptionPerKM * distance;
+        double fuelConsumption = fuelRequired(destinationPort);
 
         if (fuel >= fuelConsumption) {
             fuel -= fuelConsumption;
@@ -50,6 +50,12 @@ public class Ship implements IShip {
         } else {
             return false;
         }
+    }
+
+    public double fuelRequired(Port destinationPort){
+        double distance = currentPort.getDistance(destinationPort);
+        double fuelConsumption = fuelConsumptionPerKM * distance;
+        return fuelConsumption;
     }
 
     @Override
@@ -120,6 +126,7 @@ public class Ship implements IShip {
         liquidContainerCount = 0;
 	    refrigeratedContainerCount = 0;
         basicContainerCount = 0;
+        totalContainersCount = 0;
         System.out.println("All containers successfully unloaded.");
     }
 
@@ -242,6 +249,7 @@ public class Ship implements IShip {
         for (Container container : containers) {
             if (container instanceof HeavyContainer) {
                 heavyContainerCount++;
+                totalContainersCount ++;
             }
         }
         return heavyContainerCount;
@@ -251,6 +259,7 @@ public class Ship implements IShip {
         for (Container container : containers) {
             if (container instanceof RefrigeratedContainer) {
                 refrigeratedContainerCount++;
+                totalContainersCount ++;
             }
         }
         return refrigeratedContainerCount;
@@ -260,6 +269,7 @@ public class Ship implements IShip {
         for (Container container : containers) {
             if (container instanceof LiquidContainer) {
                 liquidContainerCount++;
+                totalContainersCount ++;
             }
         }
         return liquidContainerCount;
@@ -279,5 +289,6 @@ public class Ship implements IShip {
             // Increment the counter for basic containers
             basicContainerCount++;
         }
+        totalContainersCount ++;
     }
 }

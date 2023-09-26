@@ -283,22 +283,20 @@ public class Main {
         System.out.println("Ship Details on Current Port");
         System.out.println("--------------------------------");
         System.out.println("Ship ID: " + ship.getID());
-        System.out.println("Current Port: " + ship.getCurrentPort());
-        System.out.println("Destination Port: " + destinationPortId);
-        System.out.println("Total Distance: " + ship.getID());
-        System.out.println("Total Fuel required: " + ship.getID());
-        System.out.println("Total: " + ship.getID());
+        System.out.println("Current Port ID: " + ship.getCurrentPort());
+        System.out.println("Destination Port lD: " + destinationPortId);
+        System.out.println("Total Distance: " + destinationPort.getDistance(destinationPort));
+        System.out.println("Total Fuel required: " + ship.fuelRequired(destinationPort));
 
         System.out.println("------ Container Summary --------");
         System.out.println("Total Ship Weight capacity: " + ship.getTotalWeightCapacity());
         System.out.println("Total Containers Weight capacity: " + ship.getTotalWeight());
-        System.out.println("Total Containers: " + ship.getMaxNumberOfAllContainers()+
-            ". Total Heavy Containers: "+ ship.countHeavyContainers() +
-            ". Total Refrigerated Containers: " + ship.countRefrigeratedContainers()+
-            ". Total Liquid Containers: " + ship.countLiquidContainers());
-
-        // basic container??
-        
+        System.out.println("Total Containers: " + ship.totalContainersCount+
+            ". Total Heavy Containers: "+ ship.heavyContainerCount +
+            ". Total Refrigerated Containers: " + ship.refrigeratedContainerCount+
+            ". Total Liquid Containers: " + ship.liquidContainerCount+
+            ". Total Basic Containers: " + ship.basicContainerCount);
+            
         containersOnBoard(ship);
 
         boolean sailed = ship.sailTo(destinationPort);
@@ -403,4 +401,5 @@ public class Main {
     
         return fuelConsumed;
     }
+
 }

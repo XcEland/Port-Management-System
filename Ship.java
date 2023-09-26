@@ -22,7 +22,7 @@ public class Ship implements IShip {
                 int maxNumberOfRefrigeratedContainers, int maxNumberOfLiquidContainers, double fuelConsumptionPerKM, double fuelTankCapacity) {
         this.ID = ID;
         this.currentPort = p;
-        this.fuel = 0.0;
+        this.fuel = fuelTankCapacity;
         this.fuelTankCapacity = fuelTankCapacity;
         this.totalWeightCapacity = totalWeightCapacity;
         this.maxNumberOfAllContainers = maxNumberOfAllContainers;

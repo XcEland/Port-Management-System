@@ -301,9 +301,10 @@ public class Main {
             System.out.println("Ship Details on Current Port");
             System.out.println("--------------------------------");
             System.out.println("Ship ID: " + ship.getID());
-            System.out.println("Current Port ID: " + ship.getCurrentPort());
+            //System.out.println("Current Port ID: " + ship.getCurrentPort());
             System.out.println("Destination Port lD: " + destinationPortId);
-            System.out.println("Total Distance: " + destinationPort.getDistance(destinationPort));
+            System.out.println("Total Distance: " + ship.getCurrentPort().getDistance(destinationPort));
+            System.out.println("Fuel level: " + ship.getfuelTankCapacity());
             System.out.println("Total Fuel required: " + ship.fuelRequired(destinationPort));
 
             System.out.println("------ Container Summary --------");
@@ -336,13 +337,12 @@ public class Main {
                 }
 
                 ship.unloadAllContainers();
-            } else if(!sailed) {
-            System.out.println("Already at " + destinationPortId + ". No need to sail.");
             }
-            
             System.out.println("Failed to sail to the destination port.");
             return;
-        }
+        }else {
+            System.out.println("Already at " + destinationPortId + ". No need to sail.");
+            }
     }
 
     private static void reFuelShip() {

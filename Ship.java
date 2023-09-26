@@ -145,6 +145,7 @@ public class Ship implements IShip {
             // Decrement the counter for basic containers
             basicContainerCount--;
         }
+        totalContainersCount--;
     }
 
     public int getTotalWeight() {
